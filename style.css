@@ -1,0 +1,22 @@
+body {
+	background-color: #222;
+}
+
+h1 {
+	font-family: Lato, sans-serif;
+	color: #EEE;
+	margin-top: 30px;
+	margin-left: 30px;
+}
+
+text {
+	fill: #EEE;
+}
+
+.axis .domain {
+	display: none;
+}
+
+line {
+	display: none;
+}

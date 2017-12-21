@@ -1,37 +1,84 @@
-# ![Assessment 2][banner]
+# Assessment 2
 
-This repository can be forked for [**assessment 2**][a2] of [frontend 3][fe3]
-at [**@CMDA**][cmda].
+## Omschrijving
+In deze grouped bar chart zie je informatie over het aantal inwoners in Nederland tussen 1950 en 2010, onderverdeeld per leeftijdsgroep. Ik heb gebruik gemaakt van "dirty data" en deze gecleand met javascript.
 
-## TODO
+## Werkwijze
 
-*   [ ] [GitHub Pages](#github-pages)
-*   [ ] [Metadata](#metadata)
-*   [ ] [Issues](#issues)
-*   [ ] Replace this document in your fork with your own readme!
+De grafiek is gebaseerd op [Mike Bostock's Grouped Bar Chart](https://bl.ocks.org/mbostock/3887051).
 
-## GitHub Pages
+Ik wil mijn data op zo'n manier cleanen zodat het hetzelfde format heeft als de data die Mike Bostock heeft gebruikt. Dit is data in een CSV format en inclusief een header.
 
-Set up [GitHub Pages][pages] for this fork through the **Settings** pane.  Use
-the **Master branch** as its source.  Do not choose a Jekyll template.
+Mijn data bevat 5 "headers", waarvan er eentje de header is die ik wil gebruiken. De headers daarboven en daaronder moet ik dus weghalen. Dit doe ik door als eerste de index van het begin van de header die ik wil gebruiken op te slaan in een variabele: `var startOfHeaderIndex = doc.indexOf('"Onderwerpen";"Jonger dan 20 jaar"')`. Hier start mijn gecleande data.
 
-## Metadata
+De header die daaronder zit noem ik subheader. Deze wil ik weg heben. Met `var startOfSubHeaderIndex = doc.indexOf('"Perioden"')` sla ik de index van het begin van de subheader op in de variabele `startOfSubHeaderIndex`.
 
-Edit the **description** and **url** of your repository.  Click on edit above
-the green Clone or download button and fill in a correct description and use the
-`github.io` URL you just set up.
+Daarna doe ik `var endOfSubHeaderIndex = doc.indexOf('\n', startOfSubHeaderIndex)` om de index van het eind van de subheader op te slaan in de variabele `endOfSubHeaderIndex`.
 
-## Issues
+Vervolgens sla ik de string tussen die twee indexen op in `var subHeader = doc.substring(startOfSubHeaderIndex, endOfSubHeaderIndex)`. Later haal ik deze subheader weg.
 
-Enable issues so we can give feedback by going to the settings tab of your fork
-and checking the box next to `issues`.
+Mijn data bevat ook een footer die ik weg wil hebben. Hiervoor sla ik de index van het begin van de footer op in `var startOfFooterIndex = doc.indexOf("Centraal Bureau voor de Statistiek") - 3;`. Het lukte me niet om het copyright teken te gebruiken, vandaar de - 3.
 
-[banner]: https://cdn.rawgit.com/cmda-fe3/logo/a4b0614/banner-assessment-2.svg
+Nu kan ik de string die tussen `startOfHeaderIndex` en `startOfFooterIndex` zit opslaan in doc zodat ik alleen datgene overhoud wat ik wil gebruiken. Dat doe ik met `doc = doc.substring(startOfHeaderIndex, startOfFooterIndex).trim()`. Met  `trim()` haal ik de whitespace aan beide kanten weg.
 
-[a2]: https://github.com/cmda-fe3/course-17-18/tree/master/assessment-2#description
+De subheader haal ik weg door middel van `doc = doc.replace(subHeader + '\n', '')`. Hierbij wordt de subheader en de witregel die je overhoudt vervangen door niks.
 
-[fe3]: https://github.com/cmda-fe3
+Vervolgens haal ik alle dubbele aanhalingstekens weg door middel van `doc = doc.replace(/"/g, '')`
 
-[cmda]: https://github.com/cmda
+Daarna vervang ik met `doc = doc.replace(/;/g, ',')` alle semicolons door komma's zodat ik de data kan uitlezen als een CSV bestand.
 
-[pages]: https://pages.github.com
+De kolomnaam van de eerste kolom is nu "Onderwerpen", dit moet veranderd worden naar "Jaar". Dit doe ik met `doc = doc.replace('Onderwerpen', 'Jaar')`.
+
+Nu is de data gecleand. Ik gebruik nu `d3.csvParse` om van de string een array met objecten te maken. De cijfers over het aantal inwoners zet ik om naar numbers.
+
+```
+var data = d3.csvParse(doc, function(d) {
+    return {
+      Jaar: d.Jaar,
+      ['Jonger dan 20 jaar']: +(d['Jonger dan 20 jaar']),
+      ['20 tot 40 jaar']: +(d['20 tot 40 jaar']),
+      ['40 tot 65 jaar']: +(d['40 tot 65 jaar']),
+      ['65 tot 80 jaar']: +(d['65 tot 80 jaar']),
+      ['80 jaar of ouder']: +(d['80 jaar of ouder'])
+    }
+  })
+```
+
+Nu is de data klaar om te gebruiken.
+
+## Data
+De data die ik heb gebruikt komt van [cbs.nl](http://statline.cbs.nl/Statweb/publication/?DM=SLNL&PA=37296ned&D1=9-13&D2=0,10,20,30,40,50,60&HDR=T&STB=G1&CHARTTYPE=1&VW=T).
+
+Originele data:
+
+```
+"Bevolking; kerncijfers"
+"Onderwerpen";"Bevolking naar leeftijd (op 1 januari)";"Bevolking naar leeftijd (op 1 januari)";"Bevolking naar leeftijd (op 1 januari)";"Bevolking naar leeftijd (op 1 januari)";"Bevolking naar leeftijd (op 1 januari)"
+"Onderwerpen";"Bevolking naar leeftijd, aantallen";"Bevolking naar leeftijd, aantallen";"Bevolking naar leeftijd, aantallen";"Bevolking naar leeftijd, aantallen";"Bevolking naar leeftijd, aantallen"
+"Onderwerpen";"Jonger dan 20 jaar";"20 tot 40 jaar";"40 tot 65 jaar";"65 tot 80 jaar";"80 jaar of ouder"
+"Perioden";"aantal";"aantal";"aantal";"aantal";"aantal"
+"1950";"3742499";"2951369";"2562311";"670995";"99599"
+"1960";"4331042";"3098779";"2968611";"864423";"154399"
+"1970";"4657606";"3650362";"3338678";"1089232";"221743"
+"1980";"4431785";"4441579";"3602326";"1303447";"311877"
+"1990";"3822205";"4912128";"4252617";"1477909";"427715"
+"2000";"3873008";"4761504";"5076996";"1652103";"500339"
+"2010";"3928334";"4192772";"5915555";"1890334";"647994"
+"© Centraal Bureau voor de Statistiek, Den Haag/Heerlen 10-10-2017"
+```
+
+Gecleande data:
+
+```
+Jaar,Jonger dan 20 jaar,20 tot 40 jaar,40 tot 65 jaar,65 tot 80 jaar,80 jaar of ouder
+1950,3742499,2951369,2562311,670995,99599
+1960,4331042,3098779,2968611,864423,154399
+1970,4657606,3650362,3338678,1089232,221743
+1980,4431785,4441579,3602326,1303447,311877
+1990,3822205,4912128,4252617,1477909,427715
+2000,3873008,4761504,5076996,1652103,500339
+2010,3928334,4192772,5915555,1890334,647994
+```
+
+## Licensie
+Released under the [MIT License](https://opensource.org/licenses/MIT) © Nina van den Berg
