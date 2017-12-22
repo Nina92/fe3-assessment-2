@@ -1,6 +1,5 @@
 # Assessment 2
 
-## Pages
 https://nina92.github.io/fe3-assessment-2/
 
 ## Omschrijving
