@@ -1,5 +1,8 @@
 # Assessment 2
 
+## Pages
+https://nina92.github.io/fe3-assessment-2/
+
 ## Omschrijving
 In deze grouped bar chart zie je informatie over het aantal inwoners in Nederland tussen 1950 en 2010, onderverdeeld per leeftijdsgroep. Ik heb gebruik gemaakt van "dirty data" en deze gecleand met javascript.
 
@@ -17,7 +20,7 @@ Daarna doe ik `var endOfSubHeaderIndex = doc.indexOf('\n', startOfSubHeaderIndex
 
 Vervolgens sla ik de string tussen die twee indexen op in `var subHeader = doc.substring(startOfSubHeaderIndex, endOfSubHeaderIndex)`. Later haal ik deze subheader weg.
 
-Mijn data bevat ook een footer die ik weg wil hebben. Hiervoor sla ik de index van het begin van de footer op in `var startOfFooterIndex = doc.indexOf("Centraal Bureau voor de Statistiek") - 3;`. Het lukte me niet om het copyright teken te gebruiken, vandaar de - 3.
+Mijn data bevat ook een footer die ik weg wil hebben. Hiervoor sla ik de index van het begin van de footer op in `var startOfFooterIndex = doc.indexOf("Centraal Bureau voor de Statistiek") - 3`. Het lukte me niet om het copyright teken te gebruiken, vandaar de - 3.
 
 Nu kan ik de string die tussen `startOfHeaderIndex` en `startOfFooterIndex` zit opslaan in doc zodat ik alleen datgene overhoud wat ik wil gebruiken. Dat doe ik met `doc = doc.substring(startOfHeaderIndex, startOfFooterIndex).trim()`. Met  `trim()` haal ik de whitespace aan beide kanten weg.
 
